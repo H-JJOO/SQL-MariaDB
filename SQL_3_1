@@ -1,0 +1,126 @@
+-- Q1 테이블 생성, PK, FK 설정 옵션
+DROP TABLE t_teststudent;
+DELETE FROM t_teststudent;
+CREATE TABLE t_teststudent
+(
+	sno INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+	nm VARCHAR(5) NOT NULL,
+	age INT UNSIGNED NOT NULL,
+	ph VARCHAR(14),
+	addr VARCHAR(20),
+	gender CHAR(1) NOT NULL CHECK (gender IN ('남', '여'))
+);
+
+INSERT INTO t_teststudent
+(nm, age, ph, addr, gender)
+VALUES
+('김철수',23, '010-1234-5678', '서울', '남' ),
+('이영희',25, '010-9101-1121', '인천', '여' ),
+('박호철',27, '010-3141-5161', '강원도', '남' ),
+('조상욱',29, '010-1241-5125', '경기도', '남' ),
+('정미혜',23, '010-3535-2323', '대구', '여' );
+
+SELECT * FROM t_teststudent;
+
+SELECT * FROM t_teststudent
+WHERE pk = 1;
+
+UPDATE t_teststudent
+SET addr = '파주'
+WHERE pk = 4;
+
+DELETE FROM t_teststudent
+WHERE pk = 5;
+
+-- FORIGN KEY
+
+CREATE TABLE t_testhobby
+(
+	hno INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+	nm VARCHAR(10) NOT NULL
+);
+
+SELECT * FROM t_testhobby;
+
+INSERT INTO t_testhobby
+(nm)
+VALUES
+('게임'),
+('독서'),
+('음악감상'),
+('수영'),
+('헬스');
+
+CREATE TABLE t_teststudenthobby
+(
+	sno INT UNSIGNED,
+	hno INT UNSIGNED,
+	PRIMARY KEY (sno, hno),
+	FOREIGN KEY (sno) REFERENCES t_teststudent(sno),
+	FOREIGN KEY (hno) REFERENCES t_testhobby(hno)
+);
+
+INSERT INTO t_teststudenthobby
+(sno, hno)
+VALUES
+(1,1),
+(1,3),
+(2,2),
+(2,3),
+(3,1),
+(4,1),
+(5,4),
+(5,5);
+
+SELECT * FROM t_teststudenthobby;
+
+SELECT A.*, B.nm
+FROM t_teststudenthobby C
+INNER JOIN t_teststudent A
+ON C.sno = A.sno
+INNER JOIN t_testhobby B
+ON C.hno = B.hno
+ORDER BY A.sno
+;
+
+-- DML
+
+-- Q3
+-- 데이터 사전(9)
+
+-- DB에 있는 모든 테이블 조회
+SHOW FULL TABLES;
+
+-- 특정 테이블 인덱스 조회
+SHOW INDEX FROM t_teststudent;
+
+-- DB에 있는 모든 view 조회
+
+SHOW FULL TABLES WHERE TABLE_TYPE = 'VIEW';
+
+-- index 생성, 삭제
+CREATE INDEX idx_student_age
+ON t_teststudent(age);
+
+SELECT * FROM t_teststudent;
+
+DROP INDEX idx_student_age
+ON t_teststudent;
+
+SHOW INDEX FROM t_teststudent;
+
+-- view(명령어를 담고 있는 테이블) 생성 삭제
+
+CREATE VIEW view_testjoinresult
+AS
+SELECT A.*
+FROM t_teststudenthobby C
+INNER JOIN t_teststudent A
+ON C.sno = A.sno
+INNER JOIN t_testhobby B
+ON C.hno = B.hno;
+
+SELECT * FROM view_testjoinresult;
+
+DROP VIEW view_testjoinresult;
+
