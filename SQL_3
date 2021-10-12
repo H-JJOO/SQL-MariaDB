@@ -1,0 +1,236 @@
+-- LIKE 문
+
+SELECT * FROM t_student2
+WHERE nm LIKE '신사임당';
+
+SELECT * FROM t_student2
+WHERE nm LIKE '신사임%';
+
+SELECT * FROM t_student2
+WHERE nm LIKE '%사임당';
+
+SELECT * FROM t_student2
+WHERE nm LIKE '%사임%';
+
+SELECT * FROM t_student2
+WHERE nm LIKE '__찬';
+
+-- IF 문
+SELECT *
+, IF(age >= 24, '성인',
+		IF(age = 22, '스물둘', '청소년')
+		) AS typ
+FROM t_student2;		
+
+-- CASE 문
+
+SELECT *,
+CASE WHEN age >= 25 THEN '성인'
+	  WHEN age = 24 THEN '스물넷'
+	  WHEN age = 23 THEN '스물셋'
+	  WHEN age = 22 THEN '스물둘'
+	  ELSE '청소년'
+END AS typ
+FROM t_student2;
+
+-- SUB QUERY
+-- 스칼라 값 (컬럼 1개, 레코드 1개)
+SELECT addr FROM t_student2
+WHERE sno = 6;	 
+
+-- 스칼라 값 사용가능
+SELECT *
+FROM t_student2
+WHERE addr = (SELECT addr FROM t_student2 WHERE sno = 6);
+
+-- sno 가 6,7 번과 같은 addr 인 사람들 전부 뽑아내기
+SELECT *
+FROM t_student2
+WHERE addr = '부산' OR addr = '서울';
+
+SELECT *
+FROM t_student2
+WHERE addr IN (SELECT addr FROM t_student2 WHERE sno IN(6, 7));
+
+-- 셀프조인 으로 해결
+
+SELECT A.*
+FROM t_student2 A
+INNER JOIN t_student2 B
+ON A.addr = B.addr
+WHERE B.sno IN(6,7)
+
+/*
+ DDL (Data Definition Language) 데이터 정의어
+ 데이터 베이스를 정의하는 언어, 데이터 생성, 수정, 삭제, 전반적 골격 결정하는 역할의 언어
+CREATE : 생성
+ALTER : 수정
+DROP : 삭제
+TRUNCATE : 초기화
+*/
+
+/*
+DML(Data Manipulation Language) 데이터 조작어
+입력된 레코드를 조회하거나 수정하거나 삭제하는 등의 역할을 하는 언어
+SELECT : 조회
+INSERT : 삽입
+UPDATE : 수정
+DELETE : 삭제
+*/
+
+/*
+DCL(Data Contorl Language) 데이터 제어어
+데이터베이스에 접근하거나 객체에 권한을 주는 역할을 하는 언어
+GRANT : 권한 부여
+REVOKE : 권한 박탈, 회수
+COMMIT : 트랜잭션 확정
+ROLLBACK : 트랜잭션 취소
+*/
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+
+ -- 주로 쓰는 함수
+
+-- ABS 절대값
+SELECT -10, 10, ABS(-10), ABS(10);
+
+-- CEIL 올림(정수타입)
+SELECT CEIL(10.1), CEIL(10.5), CEIL(10.9);
+SELECT CEILING(10.1), CEILING(10.5), CEILING(10.9);
+
+-- ROUND 반올림(실수타입)
+SELECT ROUND(10.46232, 1), ROUND(10.5), ROUND(10.9);
+
+-- FLOOR 내림(정수타입)
+SELECT FLOOR(10.1), FLOOR(10.5), FLOOR(10.9);
+
+SELECT ROUND(10.44, 1), ROUND(10.45, 1)
+, TRUNCATE(10.44, 1), TRUNCATE(10.45, 1);
+
+-- 롤백이 불가능
+TRUNCATE TABLE 테이블명;
+-- 롤백이 가능
+DELETE FROM 테이블명;
+
+-- GREATEST 가장 큰값, LEAST 가장 작은 값
+SELECT *, GREATEST(sno, hno, 5), LEAST(sno, hno, 5)
+FROM t_studenthobby;
+
+--  INTERVAL 소괄호하고 첫번째 숫자가, 
+-- 그뒤 부터 같은수가 몇번째 자리에 있는가
+SELECT INTERVAL(5,1,2,4,5,6); 
+
+-- 문자 함수
+
+-- CONCAT 문자열 이어줄때
+SELECT CONCAT('안녕', '하세요', '누구누구', '입니다');
+SELECT CONCAT('10000', '원');
+
+-- INSERT ('문자열', 위치, 몇개, '변경할 문자');
+SELECT INSERT('ABCDEFG', 3, 0, '가나');
+SELECT INSERT('ABCDEFG', 3, 1, '가나');
+SELECT INSERT('ABCDEFG', 3, 2, '가나');
+
+-- REPLACE('문자열', '문자 원본', '변경할 문자');
+SELECT REPLACE('ABCDEFG', 'D', '디');
+
+-- LEFT, RIGHT, MID 문자열 자르기(길이)
+-- DB에서는  index가 아니라 길이로 하는 경우가 있음
+-- ** 빈칸도 문자
+SELECT LEFT('ABCDEFG', 4);
+SELECT RIGHT('ABCDEFG', 4);
+SELECT MID('ABCDEFG', 2, 4);
+SELECT MID('ABCDEFG', 3, 4);
+
+-- SUBSTRING(길이)
+SELECT SUBSTRING('ABCDEFG', 3, 4);
+
+-- TRIM 양쪽 모두의 공백을 없엔다.
+SELECT MID((TRIM)(' ABCDEFG '), 3, 4);
+
+-- LCASE 전부 소문자 UCASE 전부 대문자
+SELECT LCASE('AbCdEfG'), UCASE('AbCdEfG');
+
+-- REVERSE 문자열을 반대로 나열
+SELECT REVERSE('AbCdEfG')
+, LEFT(REPLACE(UCASE(REVERSE('AbCdEfG')), 'D', '디'), 4);
+
+-- 날짜 (SYSDATE() 만 알아두자), DATE FORMAT 구글링~
+SELECT NOW(), SYSDATE(), CURRENT_TIMESTAMP();
+SELECT DATE_FORMAT(NOW(), '%Y년 %m월 %d일 %T');
+
+SELECT WEEKDAY(1);
+
+-- WEEKDAY(), NOW(), CASE문 활용하여
+-- 0 > 월요일
+-- 1 > 화요일
+-- 2 > 수요일
+-- 3 > 목요일
+-- 4 > 금요일
+-- 5 > 토요일
+-- 6 > 일요일
+-- > 가 나타나도록 하세요.
+
+
+SELECT
+CONCAT(
+	CASE WEEKDAY(NOW())
+		WHEN 0 THEN '월'
+		WHEN 1 THEN '화'
+		WHEN 2 THEN '수'
+		WHEN 3 THEN '목'
+		WHEN 4 THEN '금'
+		WHEN 5 THEN '토'
+		WHEN 6 THEN '일'	
+	END,
+ '요일') AS WEEKDAY; 
+ 
+ SELECT DATEDIFF(DATE('2021-10-30'), NOW()) AS dday;
+ 
+ -- 형 변환
+ SELECT concat(FORMAT(10000000000, 0), '원');
+ SELECT concat(CAST(10000 AS CHAR), '원'), CONVERT(10000, CHAR);
+ 
+ --------------------------------------------------------------------------------------------------------------------------------------------
+
+-- UNION 테이블 합치기 (합칠 테이블이 공통으로 컬럼이 타입이 같아야한다..) 
+-- UNION 중복 제거, UNION ALL 중복 제거 X
+SELECT nm, addr FROM t_student
+UNION
+SELECT  nm, addr FROM t_student2;
+
+SELECT nm, addr FROM t_student
+UNION ALL
+SELECT  nm, addr FROM t_student2;
+
+-- distinct 중복 제거
+SELECT addr FROM t_student2;
+SELECT DISTINCT addr FROM t_student2;
+
+ --------------------------------------------------------------------------------------------------------------------------------------------
+ 
+ -- insert + select 문
+INSERT INTO t_student2
+(nm, age, addr)
+VALUES
+('', '', '');
+
+INSERT INTO t_student2
+(nm, age, addr)
+SELECT '김구', 32, '원주';
+
+INSERT INTO t_student2
+(nm, age, addr)
+SELECT '이순신', 34, addr
+FROM t_student2
+WHERE sno = 5;
+
+SELECT * FROM t_student2;
+
+
+
+
+
+ 
+ 
+
