@@ -1,0 +1,26 @@
+-- FOREIGN 이 있어서 다른 행에 영향미치는 상황이면 삭제 불가
+-- 영향이 없으면 지워짐
+DELETE FROM t_customer
+WHERE cus_no =7;
+
+-- 있든 말든 삭제하겠다 -> TRIGGER (기능 추가 라고 생각해도)
+DELETE FROM t_customer
+WHERE cus_no = 3;
+
+-- trigger
+
+DELIMITER $$
+CREATE TRIGGER trg_DEL_CUSTOMER
+BEFORE DELETE ON t_customer
+FOR EACH ROW 
+BEGIN
+	DELETE FROM t_order
+	WHERE cus_no = OLD.cus_no;
+END $$
+
+DROP TRIGGER IF EXISTS trg_DEL_CUSTOMER;
+-- OLD == t_customer // 예쩐 데이터 즉 delete로 삭제될 데이터
+-- NEW 					// 
+
+
+
